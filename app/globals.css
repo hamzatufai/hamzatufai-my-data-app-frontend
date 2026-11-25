@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-base text-slate-200 antialiased;
+    background-image:
+      radial-gradient(ellipse at top left, rgba(46, 230, 166, 0.06), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(167, 139, 250, 0.05), transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-line bg-panel/80 backdrop-blur-md shadow-card transition duration-200 hover:border-accent/20;
+  }
+}
