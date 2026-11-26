@@ -30,15 +30,6 @@ export default function DashboardPage() {
       <TopBar
         title="Dashboard"
         alerts={d.insights.openIssues}
-        action={
-          <Link
-            href="/import"
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-base transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-          >
-            <Upload className="h-4 w-4" />
-            Import CSV
-          </Link>
-        }
       />
       <ApiStatus />
 
