@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, FileSpreadsheet, Trash2, Upload } from "lucide-react";
 import Card from "@/components/Card";
@@ -15,6 +15,7 @@ const MAX_FILE_BYTES = 25 * 1024 * 1024;
 
 export default function ImportPage() {
   const profiles = useProfiles();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,9 +59,20 @@ export default function ImportPage() {
       return;
     }
 
-    worker.onmessage = (event: MessageEvent<WorkerReply>) => {
+    const timeout = window.setTimeout(() => {
       worker.terminate();
       setProcessing(false);
+      setError("CSV profiling took too long and was stopped. Try a smaller file.");
+    }, 120_000);
+
+    const finishWorker = () => {
+      window.clearTimeout(timeout);
+      worker.terminate();
+      setProcessing(false);
+    };
+
+    worker.onmessage = (event: MessageEvent<WorkerReply>) => {
+      finishWorker();
       if (!event.data.ok) {
         setError(event.data.error);
         return;
@@ -74,18 +86,23 @@ export default function ImportPage() {
         });
         setMessage(`Profiled ${event.data.profile.name}. Its summary is now on the dashboard.`);
         setFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       } catch {
         setError("The profile was calculated but could not be saved in this browser.");
       }
     };
 
     worker.onerror = () => {
-      worker.terminate();
-      setProcessing(false);
+      finishWorker();
       setError("The CSV profiler stopped unexpectedly. Try a smaller or simpler CSV.");
     };
 
-    worker.postMessage(file);
+    try {
+      worker.postMessage(file);
+    } catch {
+      finishWorker();
+      setError("The CSV could not be sent to the profiler. Choose the file again and retry.");
+    }
   }
 
   return (
@@ -110,6 +127,7 @@ export default function ImportPage() {
           <span className="font-medium text-white">{file ? file.name : "Choose a CSV file"}</span>
           <span className="text-xs text-slate-500">Maximum 25 MB · up to 250,000 data rows</span>
           <input
+            ref={fileInputRef}
             type="file"
             accept=".csv,text/csv"
             onChange={handleFileChange}
