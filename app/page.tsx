@@ -42,6 +42,30 @@ export default function DashboardPage() {
       />
       <ApiStatus />
 
+      {!hasData && (
+        <section className="glass flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="flex items-start gap-4">
+            <span className="rounded-xl bg-accent/10 p-3 text-accent">
+              <Upload className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-base font-semibold text-white">Start with a CSV file</h2>
+              <p className="mt-1 max-w-2xl text-sm text-slate-400">
+                Import a CSV to fill in your dataset count, row totals, quality score, and column
+                details. Your file is profiled in this browser; only its summary is saved here.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/import"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-base transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <Upload className="h-4 w-4" />
+            Import CSV
+          </Link>
+        </section>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total Datasets"
