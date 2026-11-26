@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Database, Rows3, Gauge, Sparkles, Upload } from "lucide-react";
+import { Database, Rows3, Gauge, Sparkles, Trash2, Upload } from "lucide-react";
+import Card from "@/components/Card";
 import StatCard from "@/components/StatCard";
 import TopBar from "@/components/TopBar";
 import QualityTrend from "@/components/QualityTrend";
@@ -16,6 +17,7 @@ import FeatureStrip from "@/components/FeatureStrip";
 import ApiStatus from "@/components/ApiStatus";
 import { dashboardData as demoData, DEMO_MODE } from "@/lib/demo";
 import { dashboardFromProfiles } from "@/lib/dashboard";
+import { removeProfile } from "@/lib/profiles";
 import { useProfiles } from "@/lib/useProfiles";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
@@ -87,6 +89,34 @@ export default function DashboardPage() {
           icon={Sparkles}
         />
       </div>
+
+      {profiles.length > 0 && (
+        <Card title={`Your CSV profiles (${profiles.length})`}>
+          <ul className="divide-y divide-line">
+            {[...profiles].reverse().map((profile) => (
+              <li key={profile.id} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-white" title={profile.name}>
+                    {profile.name}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {fmt(profile.rows)} rows · {profile.columns.length} columns · Quality {profile.quality}%
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeProfile(profile.id)}
+                  className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-400 transition hover:bg-white/5 hover:text-danger focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger"
+                  aria-label={`Remove ${profile.name} from dashboard`}
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <QualityTrend data={d.trend} />
