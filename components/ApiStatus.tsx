@@ -9,14 +9,26 @@ export default function ApiStatus() {
 
   useEffect(() => {
     apiGet<{ status: string }>("/health")
-      .then((r) => {
-        if (r.status === "ok") {
-          setState("ok");
-          setError(null);
-        } else {
-          setState("down");
-          setError(`Unexpected health response: ${r.status || "missing status"}`);
+      .then(async (health) => {
+        if (health.status !== "ok") {
+          throw new Error(`Unexpected health response: ${health.status || "missing status"}`);
         }
+
+        const stats = await apiGet<{
+          datasets: number;
+          rows: number;
+          quality: number | null;
+          operations: number;
+        }>("/dashboard/stats");
+        const validStats =
+          Number.isFinite(stats.datasets) &&
+          Number.isFinite(stats.rows) &&
+          (stats.quality === null || Number.isFinite(stats.quality)) &&
+          Number.isFinite(stats.operations);
+        if (!validStats) throw new Error("Dashboard stats response is invalid");
+
+        setState("ok");
+        setError(null);
       })
       .catch((cause: unknown) => {
         setState("down");

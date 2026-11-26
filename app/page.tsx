@@ -1,4 +1,7 @@
-import { Database, Rows3, Gauge, Sparkles } from "lucide-react";
+"use client";
+
+import Link from "next/link";
+import { Database, Rows3, Gauge, Sparkles, Upload } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import TopBar from "@/components/TopBar";
 import QualityTrend from "@/components/QualityTrend";
@@ -11,16 +14,32 @@ import WeeklyBars from "@/components/WeeklyBars";
 import RecentActivity from "@/components/RecentActivity";
 import FeatureStrip from "@/components/FeatureStrip";
 import ApiStatus from "@/components/ApiStatus";
-import { dashboardData as d } from "@/lib/demo";
+import { dashboardData as demoData, DEMO_MODE } from "@/lib/demo";
+import { dashboardFromProfiles } from "@/lib/dashboard";
+import { useProfiles } from "@/lib/useProfiles";
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
 export default function DashboardPage() {
+  const profiles = useProfiles();
+  const d = DEMO_MODE ? demoData : dashboardFromProfiles(profiles);
   const hasData = d.stats.datasets > 0;
 
   return (
     <div className="space-y-6">
-      <TopBar title="Dashboard" alerts={d.insights.openIssues} />
+      <TopBar
+        title="Dashboard"
+        alerts={d.insights.openIssues}
+        action={
+          <Link
+            href="/import"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-base transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <Upload className="h-4 w-4" />
+            Import CSV
+          </Link>
+        }
+      />
       <ApiStatus />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -32,7 +51,7 @@ export default function DashboardPage() {
           icon={Database}
         />
         <StatCard
-          label="Total Rows Processed"
+          label="Rows Profiled"
           value={fmt(d.stats.rows)}
           change={d.statChange.rows}
           series={d.statSeries.rows}

@@ -8,8 +8,8 @@ export default function RecentActivity({ items }: { items: { name: string; actio
         <EmptyState text="Imports, cleaning runs and exports are logged here." />
       ) : (
         <ul className="space-y-3">
-          {items.map((i) => (
-            <li key={i.name + i.action} className="flex items-center justify-between text-sm">
+          {items.map((i, index) => (
+            <li key={`${i.name}-${i.action}-${index}`} className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-2">
                 {i.status === "ok" ? (
                   <CheckCircle2 className="h-4 w-4 text-accent" />

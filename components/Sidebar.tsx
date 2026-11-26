@@ -6,10 +6,13 @@ import { useState } from "react";
 import { Layers, Menu, X } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/nav";
 import { DEMO_MODE, dashboardData } from "@/lib/demo";
+import { useProfiles } from "@/lib/useProfiles";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const profiles = useProfiles();
+  const latestProfile = profiles.at(-1);
   const { signal } = dashboardData;
 
   return (
@@ -71,7 +74,7 @@ export default function Sidebar() {
         </nav>
 
         <div className="mt-4 rounded-xl border border-accent/20 bg-accent/5 p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-accent">AI Signal</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-accent">Latest Profile</p>
           {DEMO_MODE ? (
             <>
               <p className="mt-2 text-lg font-bold text-accent">{signal.label}</p>
@@ -81,8 +84,16 @@ export default function Sidebar() {
                 <div className="h-full rounded-full bg-accent" style={{ width: `${signal.confidence}%` }} />
               </div>
             </>
+          ) : latestProfile ? (
+            <>
+              <p className="mt-2 truncate text-sm font-medium text-white" title={latestProfile.name}>
+                {latestProfile.name}
+              </p>
+              <p className="mt-2 text-xs text-slate-500">Quality score</p>
+              <p className="text-sm font-semibold text-white">{latestProfile.quality}%</p>
+            </>
           ) : (
-            <p className="mt-2 text-xs text-slate-500">Signals appear after you profile a dataset.</p>
+            <p className="mt-2 text-xs text-slate-500">Import a CSV to see its profile summary.</p>
           )}
         </div>
       </aside>

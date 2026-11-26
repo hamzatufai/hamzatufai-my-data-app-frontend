@@ -9,7 +9,7 @@ export type DashboardData = {
   stats: { datasets: number; rows: number; quality: number; operations: number; activity: number };
   statSeries: { datasets: number[]; rows: number[]; quality: number[]; operations: number[]; activity: number[] };
   statChange: { datasets: number; rows: number; quality: number; operations: number; activity: number };
-  trend: { day: number; score: number }[];
+  trend: { day: number; score: number; timestamp?: number; label?: string }[];
   distribution: { name: string; value: number; color: string }[];
   columns: { name: string; type: string; nullPct: number; quality: number; series: number[] }[];
   insights: { ring: number; openIssues: number; text: string };

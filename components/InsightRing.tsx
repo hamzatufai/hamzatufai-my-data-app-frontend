@@ -3,15 +3,15 @@ import Card, { EmptyState } from "./Card";
 export default function InsightRing({ ring, openIssues, text }: { ring: number; openIssues: number; text: string }) {
   if (ring <= 0) {
     return (
-      <Card title="AI Quality Signals">
-        <EmptyState text="Signals appear after profiling. Suggestions are never applied without your approval." />
+      <Card title="Profile Quality">
+        <EmptyState text="Import a CSV to calculate its quality score and missing or duplicate row counts." />
       </Card>
     );
   }
   const r = 58;
   const c = 2 * Math.PI * r;
   return (
-    <Card title="AI Quality Signals">
+    <Card title="Profile Quality">
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         <div className="relative h-40 w-40">
           <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
@@ -31,7 +31,7 @@ export default function InsightRing({ ring, openIssues, text }: { ring: number; 
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-3xl font-semibold text-white">{ring}%</span>
-            <span className="text-xs text-slate-500">Confidence</span>
+            <span className="text-xs text-slate-500">Quality score</span>
           </div>
         </div>
         <div className="text-center">

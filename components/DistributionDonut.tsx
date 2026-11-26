@@ -24,7 +24,7 @@ export default function DistributionDonut({ data }: { data: Slice[] }) {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-xs text-slate-500">Columns</span>
+              <span className="text-xs text-slate-500">Type share</span>
               <span className="text-lg font-semibold text-white">{total}%</span>
             </div>
           </div>

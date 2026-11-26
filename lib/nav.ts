@@ -15,7 +15,7 @@ export type NavItem = {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, implemented: true },
   { label: "My Datasets", href: "/datasets", icon: Database, implemented: false },
-  { label: "Import Data", href: "/import", icon: Upload, implemented: false },
+  { label: "Import Data", href: "/import", icon: Upload, implemented: true },
   { label: "Data Profiling", href: "/profiling", icon: Activity, implemented: false },
   { label: "Cleaning Studio", href: "/cleaning", icon: Sparkles, implemented: false },
   { label: "Data Transformation", href: "/transform", icon: Wand2, implemented: false },
