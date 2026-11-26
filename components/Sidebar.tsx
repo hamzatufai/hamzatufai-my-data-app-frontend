@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Layers, Menu, X } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/nav";
 import { DEMO_MODE, dashboardData } from "@/lib/demo";
@@ -11,9 +11,6 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { signal } = dashboardData;
-
-  // Close the mobile drawer on navigation.
-  useEffect(() => setOpen(false), [pathname]);
 
   return (
     <>
@@ -62,6 +59,7 @@ export default function Sidebar() {
               <Link
                 key={href}
                 href={href}
+                onClick={() => setOpen(false)}
                 aria-current={active ? "page" : undefined}
                 className={`${base} ${active ? "bg-accent/10 text-accent shadow-glow" : "text-slate-400 hover:bg-white/5 hover:text-slate-100"}`}
               >

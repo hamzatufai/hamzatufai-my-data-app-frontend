@@ -1,11 +1,11 @@
-import { Gauge, BrainCircuit, ShieldCheck, Layers3, Lock } from "lucide-react";
+import { Gauge, Activity, Sparkles, Database, Layers3 } from "lucide-react";
 
 const ITEMS = [
-  { icon: Gauge, title: "Real-time", sub: "Quality metrics" },
-  { icon: BrainCircuit, title: "AI-assisted", sub: "Suggestions, you approve" },
-  { icon: ShieldCheck, title: "Safe cleaning", sub: "Source is never changed" },
-  { icon: Layers3, title: "Multi-format", sub: "CSV, Excel, JSON and more" },
-  { icon: Lock, title: "Secure & private", sub: "Files stay on your device" },
+  { icon: Gauge, title: "Dashboard", sub: "Overview and empty states" },
+  { icon: Activity, title: "API health", sub: "Backend connection status" },
+  { icon: Sparkles, title: "Demo preview", sub: "Opt-in sample data" },
+  { icon: Database, title: "Data storage", sub: "Not connected yet" },
+  { icon: Layers3, title: "More tools", sub: "Coming soon" },
 ];
 
 export default function FeatureStrip() {

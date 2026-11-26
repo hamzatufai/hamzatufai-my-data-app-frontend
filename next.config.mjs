@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // Prevent Turbopack from inferring a workspace root above this standalone app.
+  turbopack: { root: process.cwd() },
   async headers() {
     return [
       {
