@@ -1,8 +1,19 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "";
+const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "");
 
 export async function apiGet<T>(path: string): Promise<T> {
-  if (!BASE) throw new Error("NEXT_PUBLIC_API_URL is not set");
-  const res = await fetch(`${BASE}/api${path}`, { cache: "no-store" });
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!BASE) {
+    throw new Error("NEXT_PUBLIC_API_URL is not set. Configure it in the frontend deployment and rebuild.");
+  }
+
+  const endpoint = `${BASE}/api${path.startsWith("/") ? path : `/${path}`}`;
+  let res: Response;
+  try {
+    res = await fetch(endpoint, { cache: "no-store" });
+  } catch (cause) {
+    const detail = cause instanceof Error ? cause.message : "Network request failed";
+    throw new Error(`Could not reach ${endpoint}: ${detail}`);
+  }
+
+  if (!res.ok) throw new Error(`Request to ${endpoint} failed with HTTP ${res.status}`);
   return res.json() as Promise<T>;
 }
