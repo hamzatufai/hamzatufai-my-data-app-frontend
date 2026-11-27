@@ -14,17 +14,17 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, implemented: true },
-  { label: "My Datasets", href: "/datasets", icon: Database, implemented: false },
+  { label: "My Datasets", href: "/datasets", icon: Database, implemented: true },
   { label: "Import Data", href: "/import", icon: Upload, implemented: true },
-  { label: "Data Profiling", href: "/profiling", icon: Activity, implemented: false },
+  { label: "Data Profiling", href: "/profiling", icon: Activity, implemented: true },
   { label: "Cleaning Studio", href: "/cleaning", icon: Sparkles, implemented: false },
   { label: "Data Transformation", href: "/transform", icon: Wand2, implemented: false },
   { label: "Statistical Analysis", href: "/statistics", icon: LineChart, implemented: false },
   { label: "Data Validation", href: "/validation", icon: ShieldCheck, implemented: false },
   { label: "SQL Workspace", href: "/sql", icon: Terminal, implemented: false },
-  { label: "Export Center", href: "/export", icon: Download, implemented: false },
+  { label: "Export Center", href: "/export", icon: Download, implemented: true },
   { label: "Integrations", href: "/integrations", icon: Plug, implemented: false },
-  { label: "Cleaning History", href: "/history", icon: History, implemented: false },
-  { label: "Settings", href: "/settings", icon: Settings, implemented: false },
+  { label: "Cleaning History", href: "/history", icon: History, implemented: true },
+  { label: "Settings", href: "/settings", icon: Settings, implemented: true },
   { label: "Help & Support", href: "/help", icon: LifeBuoy, implemented: false },
 ];

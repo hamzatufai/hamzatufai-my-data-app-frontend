@@ -11,6 +11,7 @@ const config: Config = {
         accent: "#2ee6a6",
         violet: "#a78bfa",
         danger: "#f87171",
+        warning: "#f5b646",
       },
       fontFamily: {
         sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Inter", "sans-serif"],

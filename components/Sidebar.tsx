@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Layers, Menu, X } from "lucide-react";
 import { NAV_ITEMS } from "@/lib/nav";
 import { DEMO_MODE, dashboardData } from "@/lib/demo";
+import { useBranding } from "@/lib/branding";
 import { useProfiles } from "@/lib/useProfiles";
 
 export default function Sidebar() {
@@ -14,6 +15,9 @@ export default function Sidebar() {
   const profiles = useProfiles();
   const latestProfile = profiles.at(-1);
   const { signal } = dashboardData;
+  const brand = useBranding();
+
+  const base = "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition duration-150";
 
   return (
     <>
@@ -38,8 +42,13 @@ export default function Sidebar() {
       >
         <div className="mb-6 flex items-center justify-between px-2 py-1">
           <span className="flex items-center gap-2">
-            <Layers className="h-5 w-5 text-accent" />
-            <span className="text-lg font-semibold tracking-tight text-white">CleanCSV</span>
+            {brand.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- data URL from our own branding API
+              <img src={brand.logoUrl} alt={`${brand.platformName} logo`} className="h-6 w-6 rounded object-contain" />
+            ) : (
+              <Layers className="h-5 w-5 text-accent" />
+            )}
+            <span className="text-lg font-semibold tracking-tight text-white">{brand.platformName}</span>
           </span>
           <button type="button" onClick={() => setOpen(false)} aria-label="Close navigation" className="text-slate-400 lg:hidden">
             <X className="h-5 w-5" />
@@ -48,7 +57,6 @@ export default function Sidebar() {
 
         <nav aria-label="Main" className="flex-1 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map(({ label, href, icon: Icon, implemented }) => {
-            const base = "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition duration-150";
             if (!implemented) {
               return (
                 <span key={href} aria-disabled="true" title="Coming soon" className={`${base} cursor-not-allowed text-slate-600`}>

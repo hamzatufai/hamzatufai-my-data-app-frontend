@@ -3,24 +3,29 @@
 import { useEffect, useState } from "react";
 import { apiGet } from "@/lib/api";
 
-const RETRY_INTERVAL_MS = 30_000;
+const RETRY_DOWN_MS = 8_000; // retry cadence while unhealthy
+const RETRY_OK_MS = 60_000; // periodic re-verify while healthy
 
 export default function ApiStatus() {
-  const [state, setState] = useState<"checking" | "ok" | "down">("checking");
+  const [state, setState] = useState<"checking" | "ok" | "stale" | "down">("checking");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
     let checking = false;
-    let firstCheck = true;
+    let lastError: string | null = null;
+    let lastOk = false;
 
-    const checkApi = async () => {
+    const check = async () => {
       if (checking) return;
       checking = true;
-      if (firstCheck && active) setState("checking");
-
       try {
-        const health = await apiGet<{ status: string }>("/health");
+        // Health first (cheap endpoint); only pull dashboard stats once health
+        // is OK so a dead backend never blocks on a cold-started endpoint.
+        const health = await apiGet<{ status: string }>("/health", {
+          timeoutMs: 10_000,
+          retries: 2,
+        });
         if (health.status !== "ok") {
           throw new Error(`Unexpected health response: ${health.status || "missing status"}`);
         }
@@ -30,7 +35,8 @@ export default function ApiStatus() {
           rows: number;
           quality: number | null;
           operations: number;
-        }>("/dashboard/stats");
+        }>("/dashboard/stats", { timeoutMs: 25_000, retries: 2 });
+
         const validStats =
           Number.isFinite(stats.datasets) &&
           Number.isFinite(stats.rows) &&
@@ -42,30 +48,46 @@ export default function ApiStatus() {
           setState("ok");
           setError(null);
         }
-      } catch (cause: unknown) {
-        if (active) {
-          setState("down");
-          setError(cause instanceof Error ? cause.message : "Unknown connection error");
+        lastOk = true;
+      } catch (cause) {
+        lastOk = false;
+        const message =
+          cause instanceof Error ? cause.message.split(" — ")[0] : "Unknown error";
+        if (!active) return;
+        setState((prev) =>
+          prev === "checking" || prev === "ok" || prev === "stale" ? "down" : prev,
+        );
+        if (message !== lastError) {
+          setError(message);
+          lastError = message;
         }
       } finally {
-        firstCheck = false;
         checking = false;
       }
     };
 
-    const retryWhenOnline = () => void checkApi();
-    const retryWhenVisible = () => {
-      if (document.visibilityState === "visible") void checkApi();
+    const loop = async () => {
+      while (active) {
+        await check();
+        await new Promise((r) => setTimeout(r, lastOk ? RETRY_OK_MS : RETRY_DOWN_MS));
+      }
     };
 
-    void checkApi();
-    const interval = window.setInterval(() => void checkApi(), RETRY_INTERVAL_MS);
+    void loop();
+
+    const retryWhenOnline = () => {
+      lastError = null;
+      void check();
+    };
+    const retryWhenVisible = () => {
+      if (document.visibilityState === "visible") void check();
+    };
+
     window.addEventListener("online", retryWhenOnline);
     document.addEventListener("visibilitychange", retryWhenVisible);
 
     return () => {
       active = false;
-      window.clearInterval(interval);
       window.removeEventListener("online", retryWhenOnline);
       document.removeEventListener("visibilitychange", retryWhenVisible);
     };
@@ -76,19 +98,24 @@ export default function ApiStatus() {
       ? "text-accent"
       : state === "down"
         ? "text-danger"
-        : "text-slate-500";
+        : state === "stale"
+          ? "text-warning"
+          : "text-slate-500";
   const label =
     state === "ok"
       ? "API connected"
-      : state === "down"
-        ? "API unreachable"
-        : "Checking API...";
+      : state === "stale"
+        ? "API reconnecting"
+        : state === "down"
+          ? "API unreachable — retrying"
+          : "Checking API...";
 
   return (
     <span className={`inline-flex items-center gap-2 text-xs ${color}`}>
-      <span className="h-2 w-2 rounded-full bg-current" />
+      <span className="h-2 w-2 rounded-full bg-current" aria-hidden />
       <span title={error ?? undefined} aria-live="polite">
-        {label}{error ? `: ${error}` : ""}
+        {label}
+        {error ? `: ${error}` : ""}
       </span>
     </span>
   );
