@@ -58,22 +58,20 @@ export default function AdminSignInPage() {
           {setupOpen === false && (
             <p className="mb-3 mx-auto max-w-[640px] rounded-lg border border-warning/40 bg-warning/10 px-4 py-2.5 text-xs text-warning">
               SETUP_TOKEN is not configured on this deployment yet. Add it to the <b>backend</b>
-              project env in Vercel (Production checked for production domains, Preview checked for preview
-              URLs), redeploy the backend, then paste the same value below. Until then the server will
-              reject every setup attempt.
+              project env in Vercel (ticking Production for the production domain), redeploy the
+              backend, then paste the same value below. Until then the server rejects every setup
+              attempt.
             </p>
-          )
-          }
-          <FirstSetupBox />
-        <div className="glass mx-auto w-full max-w-xl p-8">
-          <h1 className="text-xl font-semibold text-white">First-run admin setup</h1>
-          <p className="mt-1 text-xs text-slate-500">
-            ADM-01: public admin sign-up exists only during first-run setup and requires the one-time
-            setup token set at deployment (SETUP_TOKEN environment variable). After one admin exists,
-            this page never shows setup again.
-          </p>
-          <AdminSetupForm onSuccess={() => router.push("/admin")} />
-        </div>
+          )}
+          <div className="glass mx-auto w-full max-w-xl p-8">
+            <h1 className="text-xl font-semibold text-white">First-run admin setup</h1>
+            <p className="mt-1 text-xs text-slate-500">
+              ADM-01: public admin sign-up exists only during first-run setup and requires the one-time
+              setup token set at deployment (SETUP_TOKEN environment variable). After one admin exists,
+              this page never shows setup again.
+            </p>
+            <AdminSetupForm onSuccess={() => router.push("/admin")} />
+          </div>
         </>
       ) : (
         <div className="glass mx-auto w-full max-w-md p-8">
@@ -106,19 +104,6 @@ export default function AdminSignInPage() {
           </p>
         </div>
       )}
-    </div>
-  );
-}
-
-function FirstSetupBox() {
-  return (
-    <div className="glass mx-auto w-full max-w-xl p-8">
-      <h1 className="text-xl font-semibold text-white">First-run admin setup</h1>
-      <p className="mt-1 text-xs text-slate-500">
-        ADM-01: viable only during first-run setup and requires the one-time setup token set at
-        deployment (SETUP_TOKEN on the backend). After one admin exists, setup is closed forever.
-      </p>
-      <AdminSetupForm onSuccess={() => undefined} />
     </div>
   );
 }
