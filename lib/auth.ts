@@ -92,11 +92,14 @@ export async function authRequest<T>(
   }
 
   if (lastError instanceof Error && lastError.message.startsWith("Request failed")) throw lastError;
-  const onPreview = typeof window !== "undefined" && window.location.hostname.includes("-") && window.location.hostname.endsWith("vercel.app") && window.location.hostname !== "hamzatufai-my-data-app-frontend.vercel.app";
+  // Make the recovery self-service: point the user at the known-good
+  // production deployment rather than guessing which build they are on.
+  const host = typeof window !== "undefined" ? window.location.hostname : "";
+  const isProd = host === "hamzatufai-my-data-app-frontend.vercel.app";
   throw new Error(
-    onPreview
-      ? "Could not reach the server. This looks like a Vercel PREVIEW deployment — preview builds do not have the production env vars. Fix: in Vercel, edit each env var on the frontend project and tick Preview (and use the production domain for normal use)."
-      : "Could not reach the server. In Vercel set NEXT_PUBLIC_USE_API_PROXY=true and API_PROXY_TARGET=<backend URL> on the frontend project, then redeploy. Or override from the Settings page.",
+    isProd
+      ? "Could not reach the server even on the production domain. Check backend status (it may be redeploying), or set API_PROXY_TARGET/NEXT_PUBLIC_USE_API_PROXY on the frontend project and redeploy."
+      : `You are on "${host}" — a build that cannot reach the API (older preview or missing env vars). Open the production site instead: https://hamzatufai-my-data-app-frontend.vercel.app — or in Vercel redeploy so this build includes the latest code.`,
   );
 }
 
