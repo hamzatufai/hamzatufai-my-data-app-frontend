@@ -14,6 +14,14 @@ export function proxyEnabled(): boolean {
   return process.env.NEXT_PUBLIC_USE_API_PROXY === "true";
 }
 
+/**
+ * Last-resort backend origin, used when the build-time env vars are absent
+ * (e.g. a Vercel Preview deployment whose env vars only have Production
+ * ticked). The URL is public browser knowledge anyway, so embedding it creates
+ * no new exposure; the backend still decides which origins may call it.
+ */
+const FALLBACK_API_BASE = "https://hamzatufai-my-data-app-backend.vercel.app";
+
 const OVERRIDE_KEY = "cleancsv:api-url";
 const REQUEST_TIMEOUT_MS = 25_000;
 const HEALTH_TIMEOUT_MS = 10_000;
@@ -24,6 +32,7 @@ const staleCache = new Map<string, unknown>();
 
 export function getApiBase(): string {
   let base = process.env.NEXT_PUBLIC_API_URL ?? "";
+  if (!base) base = FALLBACK_API_BASE;
 
   // A localhost/blank base can only come from developer settings or a
   // misconfigured production build where NEXT_PUBLIC_API_URL was never set in
@@ -89,9 +98,12 @@ export function apiCandidates(path: string): string[] {
   const p = path.startsWith("/") ? path : `/${path}`;
   const base = getApiBase();
   const relative = `/api${p.replace(/^\/api/, "")}`;
+  // Direct backend origin first (works on production AND preview builds thanks
+  // to the baked-in fallback); same-origin proxy as the faster fallback when
+  // the build enabled it.
   const direct = `${base}/api${p.replace(/^\/api/, "")}`;
-  const list = [relative];
-  if (base && direct !== relative) list.push(direct);
+  const list = [direct];
+  if (base && direct !== relative) list.push(relative);
   return list;
 }
 
