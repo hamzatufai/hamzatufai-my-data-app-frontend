@@ -76,6 +76,10 @@ export default function SignInPage() {
           <Link href="/signup" className="hover:text-accent">Need an account? Sign up</Link>
           <Link href="/forgot" className="hover:text-accent">Forgot password?</Link>
         </div>
+        <p className="text-center text-xs text-slate-600">
+          Administrator? <Link href="/admin/signin" className="hover:text-accent">Admin sign-in</Link> ·{" "}
+          <Link href="/" className="hover:text-accent">Open the CleanCSV platform</Link>
+        </p>
       </form>
     </AuthShell>
   );

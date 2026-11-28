@@ -59,6 +59,9 @@ export default function VerifyEmailClient() {
             Request a new verification link
           </Link>
         )}
+        <p className="text-center text-xs text-slate-500">
+          <Link href="/" className="hover:text-accent">Open the CleanCSV platform →</Link>
+        </p>
       </div>
     </AuthShell>
   );

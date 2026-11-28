@@ -104,7 +104,10 @@ export default function StatusClient() {
         {state === "pending" && (
           <>
             <p>Your request is in the admin queue. You will receive an email when it is reviewed.</p>
-            <Link href="/signin" className="text-xs text-accent hover:underline">Return to sign-in</Link>
+            <div className="flex flex-wrap items-center gap-4">
+              <Link href="/signin" className="text-xs text-accent hover:underline">Return to sign-in</Link>
+              <Link href="/" className="text-xs text-slate-400 hover:text-white">Open the CleanCSV platform →</Link>
+            </div>
           </>
         )}
 

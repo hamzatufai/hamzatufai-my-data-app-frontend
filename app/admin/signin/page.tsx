@@ -101,7 +101,8 @@ export default function AdminSignInPage() {
             </button>
           </form>
           <p className="mt-4 text-center text-xs text-slate-500">
-            <Link href="/signin" className="hover:text-accent">Regular user sign-in</Link>
+            <Link href="/signin" className="hover:text-accent">Regular user sign-in</Link> ·{" "}
+            <Link href="/" className="hover:text-accent">Open the CleanCSV platform</Link>
           </p>
         </div>
       )}
