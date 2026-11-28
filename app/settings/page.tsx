@@ -1,6 +1,57 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api";
+
+function ConnectionTest() {
+  const [status, setStatus] = useState<"idle" | "testing" | "ok" | "fail">("idle");
+  const [detail, setDetail] = useState<string | null>(null);
+
+  async function runTest() {
+    setStatus("testing");
+    setDetail(null);
+    try {
+      const health = await apiGet<{ status: string }>("/health", { retries: 2, timeoutMs: 15000 });
+      if (health.status === "ok") {
+        setStatus("ok");
+        setDetail("GET /api/health OK — backend reachable.");
+      } else {
+        setStatus("fail");
+        setDetail(`Unexpected health response: ${JSON.stringify(health)}`);
+      }
+    } catch (cause) {
+      setStatus("fail");
+      setDetail(cause instanceof Error ? cause.message : "Network request failed");
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-line bg-panel p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium text-white">Connection diagnostics</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Tests GET /api/health through the exact request path the app uses (same-origin proxy
+            first, then the configured backend base).
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void runTest()}
+          disabled={status === "testing"}
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-base disabled:opacity-40"
+        >
+          {status === "testing" ? "Testing…" : "Run test"}
+        </button>
+      </div>
+      {detail && (
+        <p className={`mt-3 text-xs ${status === "ok" ? "text-accent" : "text-danger"}`} role="status">
+          {detail}
+        </p>
+      )}
+    </div>
+  );
+}
 import { Save, Trash2 } from "lucide-react";
 import Card from "@/components/Card";
 import TopBar from "@/components/TopBar";
@@ -90,6 +141,7 @@ export default function SettingsPage() {
               </p>
             )}
           </div>
+          <ConnectionTest />
         </div>
       </Card>
 

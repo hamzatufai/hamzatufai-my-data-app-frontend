@@ -13,7 +13,7 @@ export type SessionInfo = {
   user?: { id: string; name: string; email: string; role: string };
 };
 
-import { getApiBase } from "@/lib/api";
+import { apiCandidates, getApiBase } from "@/lib/api";
 
 const SESSION_KEY = "cleancsv:session";
 
@@ -51,9 +51,10 @@ export async function authRequest<T>(
   // One automatic retry absorbs a serverless cold start or a dropped keep-alive
   // connection; both appear as instant "Failed to fetch" otherwise.
   for (let attempt = 0; attempt < 3; attempt++) {
-    // Attempt 0-1: configured path (proxy/override). Attempt 2: relative path
-    // fallback so a stale env value can never brick sign-in.
-    const target = attempt < 2 ? `${base}${path}` : path;
+    // Relative (same-origin proxy) first; then the configured base; then
+    // relative again — so no env combination can brick sign-in.
+    const candidates = apiCandidates(path);
+    const target = candidates[Math.min(attempt, candidates.length - 1)];
     try {
       const res = await fetch(target, {
         method,

@@ -79,6 +79,22 @@ function apiUrl(path: string): string {
   return `${getApiBase()}/api${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/**
+ * Candidate URLs in priority order. The RELATIVE same-origin path comes first:
+ * when next.config rewrites proxy /api to the backend, the browser never makes
+ * a cross-origin request — the strongest and fastest configuration, and it
+ * works whether or not NEXT_PUBLIC_* env flags were set at build time.
+ */
+export function apiCandidates(path: string): string[] {
+  const p = path.startsWith("/") ? path : `/${path}`;
+  const base = getApiBase();
+  const relative = `/api${p.replace(/^\/api/, "")}`;
+  const direct = `${base}/api${p.replace(/^\/api/, "")}`;
+  const list = [relative];
+  if (base && direct !== relative) list.push(direct);
+  return list;
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
