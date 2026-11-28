@@ -91,8 +91,11 @@ export async function authRequest<T>(
   }
 
   if (lastError instanceof Error && lastError.message.startsWith("Request failed")) throw lastError;
+  const onPreview = typeof window !== "undefined" && window.location.hostname.includes("-") && window.location.hostname.endsWith("vercel.app") && window.location.hostname !== "hamzatufai-my-data-app-frontend.vercel.app";
   throw new Error(
-    `Could not reach the server. Check that the backend URL is configured (build-time env, NEXT_PUBLIC_USE_API_PROXY, or the Settings page).`,
+    onPreview
+      ? "Could not reach the server. This looks like a Vercel PREVIEW deployment — preview builds do not have the production env vars. Fix: in Vercel, edit each env var on the frontend project and tick Preview (and use the production domain for normal use)."
+      : "Could not reach the server. In Vercel set NEXT_PUBLIC_USE_API_PROXY=true and API_PROXY_TARGET=<backend URL> on the frontend project, then redeploy. Or override from the Settings page.",
   );
 }
 
