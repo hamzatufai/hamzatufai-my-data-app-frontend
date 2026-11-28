@@ -4,7 +4,9 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authInputClass, authButtonClass } from "@/app/auth/shared";
-import { authRequest, storeSessionToken } from "@/lib/auth";
+import { authRequest, fetchSession, storeSessionToken, type SessionInfo } from "@/lib/auth";
+
+const PROD_URL = "https://hamzatufai-my-data-app-frontend.vercel.app";
 
 export default function AdminSignInPage() {
   const router = useRouter();
@@ -12,8 +14,14 @@ export default function AdminSignInPage() {
   const [busy, setBusy] = useState(false);
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
   const [setupOpen, setSetupOpen] = useState<boolean | null>(null);
+  const [session, setSession] = useState<SessionInfo | null>(null);
 
   useEffect(() => {
+    // Already an admin (e.g. via a claimed account)? Straight to the dashboard.
+    fetchSession().then((info) => {
+      setSession(info);
+      if (info.role === "admin") router.replace("/admin");
+    });
     fetch("/api/admin/setup")
       .then((r) => r.json())
       .then((r: { setupOpen: boolean; hasAdmin: boolean }) => {
@@ -49,6 +57,37 @@ export default function AdminSignInPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  // A signed-in regular user opening the admin area is NOT shown duplicate
+  // setup: their existing account can be claimed with the setup token, or they
+  // get a clear one-click route to where they belong.
+  if (session?.authenticated && session.role === "user") {
+    return (
+      <div className="flex min-h-[80vh] flex-col justify-center px-2">
+        <div className="glass mx-auto w-full max-w-md p-8">
+          <h1 className="text-lg font-semibold text-white">Signed in as a regular user</h1>
+          <p className="mt-2 text-sm text-slate-400">
+            You are signed in as <span className="text-slate-200">{session.user?.email}</span>. Workspace
+            access is on the main platform. To become the platform administrator, use first-run setup
+            below with your <b>SETUP_TOKEN</b> — it upgrades this exact account (same email + password),
+            no second registration needed.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-base hover:bg-accent/90">
+              Go to my CleanCSV dashboard →
+            </Link>
+            <button
+              type="button"
+              onClick={() => setHasAdmin(false)}
+              className="rounded-lg border border-line px-4 py-2 text-sm text-slate-300 hover:border-accent/40"
+            >
+              Claim admin with SETUP_TOKEN
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
